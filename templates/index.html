@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Internee Assistant | Internee.pk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#10281a;--muted:#62756a;--paper:#f6f8f5;--card:#fff;--line:#dfe7da;--green:#3c9a1c;--green-dark:#2b7412;--mint:#e8f4e2;--amber:#f0a500}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:"Plus Jakarta Sans",system-ui,sans-serif;color:var(--ink);background:var(--card);display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+.top{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--line);background:var(--card)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800}
+.status{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted);font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.new{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-weight:600;font-size:.88rem}
+.new:hover{border-color:var(--green);background:var(--mint)}
+
+.scroller{flex:1;overflow-y:auto;scroll-behavior:smooth}
+.col{max-width:760px;margin:0 auto;padding:28px 20px 12px}
+
+/* empty state */
+.hero{text-align:center;padding:9vh 0 24px}
+.hero .big{width:60px;height:60px;border-radius:18px;background:var(--green);color:#fff;font-size:1.6rem;font-weight:800;display:grid;place-items:center;margin:0 auto 18px}
+.hero h1{font-size:1.9rem;letter-spacing:-.03em}
+.hero p{color:var(--muted);margin-top:8px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:28px}
+.card{text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:.92rem;font-weight:500;color:var(--ink)}
+.card:hover{background:var(--mint);border-color:var(--green)}
+
+/* messages */
+.row{display:flex;gap:14px;margin-bottom:26px}
+.row.user{justify-content:flex-end}
+.bubble{background:var(--mint);padding:11px 16px;border-radius:18px 18px 4px 18px;max-width:80%;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.av{flex:none;width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;font-size:.8rem;font-weight:800;display:grid;place-items:center;margin-top:2px}
+.body{flex:1;min-width:0;line-height:1.75;font-size:.98rem}
+.body p{margin:0 0 12px}
+.body ul,.body ol{margin:0 0 12px;padding-left:22px}
+.body li{margin-bottom:4px}
+.body h3,.body h4{margin:16px 0 8px;letter-spacing:-.01em}
+.body code{font-family:"JetBrains Mono",monospace;font-size:.86em;background:#eef2ec;padding:2px 6px;border-radius:6px}
+.body pre{background:#12261a;color:#e6f2e9;border-radius:12px;padding:14px 16px;overflow-x:auto;margin:0 0 14px;font-size:.85rem;line-height:1.55}
+.body pre code{background:none;padding:0;color:inherit}
+.body a{color:var(--green-dark)}
+.tools{display:flex;gap:6px;margin-top:6px}
+.tools button{background:none;border:0;color:var(--muted);font-size:.8rem;padding:4px 8px;border-radius:8px;font-weight:600}
+.tools button:hover:not(:disabled){background:var(--paper);color:var(--ink)}
+.tools button:disabled{opacity:.6;cursor:default}
+.caret::after{content:"";display:inline-block;width:8px;height:16px;background:var(--green);margin-left:3px;vertical-align:-3px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* composer */
+.composer{padding:8px 20px 14px;background:linear-gradient(to top,#fff 70%,rgba(255,255,255,0))}
+.box{max-width:760px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;border:1px solid #cbd8c5;border-radius:22px;padding:8px 8px 8px 18px;background:#fff;box-shadow:0 4px 18px rgba(16,40,26,.06)}
+.box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(60,154,28,.16)}
+textarea{flex:1;border:0;outline:0;resize:none;font:inherit;line-height:1.5;max-height:180px;padding:9px 0;background:none}
+.send{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:var(--green);color:#fff;display:grid;place-items:center}
+.send:hover:not(:disabled){background:var(--green-dark)}
+.send:disabled{background:#c9d6c4;cursor:default}
+.fine{text-align:center;font-size:.76rem;color:var(--muted);margin-top:8px}
+
+@media(max-width:640px){.cards{grid-template-columns:1fr}.top{padding:10px 14px}.hero{padding-top:5vh}.bubble{max-width:90%}.status span.t{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="mark">i</div>Internee Assistant</div>
+  <div class="status"><span class="dot"></span><span class="t">Online 24/7</span></div>
+  <button class="new" id="new" type="button">New chat</button>
+</header>
+
+<div class="scroller" id="scroller"><div class="col" id="col"></div></div>
+
+<div class="composer">
+  <form class="box" id="form">
+    <textarea id="input" rows="1" maxlength="1500" placeholder="Message Internee Assistant..." aria-label="Message"></textarea>
+    <button class="send" id="send" type="submit" aria-label="Send">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </form>
+  <p class="fine">Internee Assistant can make mistakes. Check your task's Guidelines tab for official instructions.</p>
+</div>
+
+<script>
+const col=document.getElementById('col'), scroller=document.getElementById('scroller');
+const form=document.getElementById('form'), input=document.getElementById('input'), sendBtn=document.getElementById('send');
+const SID=(crypto.randomUUID&&crypto.randomUUID())||String(Date.now());
+let history=[], busy=false;
+
+const SUGGEST=['How do I submit my task?','How do I get my certificate?','Which internship tracks are available?','Explain what a Flask route is'];
+
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function inline(t){
+  return t.replace(/`([^`]+)`/g,'<code>$1</code>')
+          .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
+          .replace(/(^|[^*])\*([^*\s][^*]*)\*/g,'$1<i>$2</i>');
+}
+function md(src){
+  const parts=esc(src).split(/```/);
+  let out='';
+  parts.forEach((p,i)=>{
+    if(i%2===1){ out+='<pre><code>'+p.replace(/^[a-zA-Z0-9+#-]*\n/,'')+'</code></pre>'; return; }
+    let html='',list=null;
+    const close=()=>{ if(list){html+='</'+list+'>';list=null} };
+    p.split('\n').forEach(l=>{
+      let m;
+      if((m=l.match(/^\s*[-*]\s+(.*)/))){ if(list!=='ul'){close();html+='<ul>';list='ul'} html+='<li>'+inline(m[1])+'</li>'; }
+      else if((m=l.match(/^\s*\d+[.)]\s+(.*)/))){ if(list!=='ol'){close();html+='<ol>';list='ol'} html+='<li>'+inline(m[1])+'</li>'; }
+      else if((m=l.match(/^#{1,4}\s+(.*)/))){ close(); html+='<h4>'+inline(m[1])+'</h4>'; }
+      else if(l.trim()){ close(); html+='<p>'+inline(l)+'</p>'; }
+      else close();
+    });
+    close(); out+=html;
+  });
+  return out;
+}
+function down(){ scroller.scrollTop=scroller.scrollHeight }
+
+function hero(){
+  col.innerHTML='<div class="hero"><div class="big">i</div><h1>How can I help you today?</h1><p>Ask about your tasks, submissions, certificates, or get help with your code.</p><div class="cards" id="cards"></div></div>';
+  const c=document.getElementById('cards');
+  SUGGEST.forEach(q=>{const b=document.createElement('button');b.type='button';b.className='card';b.textContent=q;b.onclick=()=>send(q);c.appendChild(b)});
+}
+function userRow(t){
+  const r=document.createElement('div');r.className='row user';
+  r.innerHTML='<div class="bubble"></div>'; r.firstChild.textContent=t; col.appendChild(r);
+}
+function botRow(){
+  const r=document.createElement('div');r.className='row';
+  r.innerHTML='<div class="av">i</div><div><div class="body caret"></div><div class="tools"></div></div>';
+  r.lastChild.style.flex='1';r.lastChild.style.minWidth='0';
+  col.appendChild(r); return r;
+}
+function addTools(row,text,question){
+  const t=row.querySelector('.tools');
+  const copy=document.createElement('button');copy.type='button';copy.textContent='Copy';
+  copy.onclick=()=>{navigator.clipboard.writeText(text);copy.textContent='Copied';setTimeout(()=>copy.textContent='Copy',1500)};
+  const regen=document.createElement('button');regen.type='button';regen.textContent='Regenerate';
+  regen.onclick=()=>{ if(busy)return; history.splice(-2); row.previousSibling.remove(); row.remove(); send(question,true) };
+  const up=document.createElement('button');up.type='button';up.textContent='Helpful';
+  const dn=document.createElement('button');dn.type='button';dn.textContent='Not helpful';
+  [[up,true],[dn,false]].forEach(([b,v])=>b.onclick=()=>{up.disabled=dn.disabled=true;
+    fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:SID,question,helpful:v})}).catch(()=>{})});
+  t.append(copy,regen,up,dn);
+}
+
+async function send(q,isRetry){
+  q=(q||'').trim(); if(!q||busy) return;
+  busy=true; sendBtn.disabled=true;
+  if(!history.length && !isRetry) col.innerHTML='';
+  userRow(q); input.value=''; input.style.height='auto';
+  const row=botRow(), body=row.querySelector('.body');
+  down();
+  let text='';
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:q,history,session_id:SID})});
+    if(!r.ok||!r.body) throw new Error('bad response');
+    const reader=r.body.getReader(), dec=new TextDecoder();
+    while(true){
+      const {done,value}=await reader.read(); if(done)break;
+      text+=dec.decode(value,{stream:true});
+      body.innerHTML=md(text); down();
+    }
+    text+=dec.decode();
+    body.innerHTML=md(text||'No response received. Please try again.');
+    body.classList.remove('caret');
+    history.push({role:'user',content:q},{role:'assistant',content:text});
+    addTools(row,text,q);
+  }catch(e){
+    body.classList.remove('caret');
+    body.innerHTML='<p>I could not reach the server. Check your connection and try again.</p>';
+  }
+  busy=false; sendBtn.disabled=!input.value.trim(); down(); input.focus();
+}
+
+input.addEventListener('input',()=>{input.style.height='auto';input.style.height=input.scrollHeight+'px';sendBtn.disabled=busy||!input.value.trim()});
+input.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()} });
+form.addEventListener('submit',e=>{e.preventDefault();send(input.value)});
+document.getElementById('new').onclick=()=>{ if(busy)return; history=[]; hero(); input.focus() };
+hero(); sendBtn.disabled=true; input.focus();
+</script>
+</body>
+</html>
