@@ -32,7 +32,7 @@ GROK_API_KEY = _find_key()
 if GROK_API_KEY.startswith("gsk_"):
     PROVIDER = "Groq"
     GROK_URL = "https://api.groq.com/openai/v1/chat/completions"
-    GROK_MODEL = os.getenv("GROK_MODEL", "llama-3.3-70b-versatile")
+    GROK_MODEL = os.getenv("GROK_MODEL", "openai/gpt-oss-20b")
 else:
     PROVIDER = "xAI Grok"
     GROK_URL = "https://api.x.ai/v1/chat/completions"
@@ -107,6 +107,9 @@ def stream_grok(messages):
     )
     if r.status_code != 200:
         raise RuntimeError(f"Grok API error {r.status_code}: {r.text[:300]}")
+    # Fix: the API does not send a charset, so requests guesses Latin-1 and garbles
+    # apostrophes, emojis and Urdu text. Force UTF-8.
+    r.encoding = "utf-8"
     for line in r.iter_lines(decode_unicode=True):
         if not line or not line.startswith("data:"):
             continue
@@ -180,7 +183,11 @@ def chat():
             yield msg
         log("chat_logs", {"session_id": session_id, "question": question, "answer": "".join(parts)})
 
-    return Response(generate(), mimetype="text/plain", headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"})
+    return Response(
+        generate(),
+        mimetype="text/plain",
+        headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"},
+    )
 
 
 @app.route("/api/feedback", methods=["POST"])
